@@ -41,31 +41,6 @@ public class Base extends Activity {
         }
         LocationManager lM = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         Location userLocation = lM.getLastKnownLocation(lM.NETWORK_PROVIDER);
-        LocationListener locList = new LocationListener(){
-
-			public void onLocationChanged(Location arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void onProviderDisabled(String provider) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void onProviderEnabled(String provider) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-				// TODO Auto-generated method stub
-				
-			}
-        	
-        };
-        lM.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locList);
         if (userLocation != null)
         	tv.append("\n"+userLocation.toString());
         else
@@ -73,7 +48,7 @@ public class Base extends Activity {
         Geocoder gC = new Geocoder(getBaseContext(),Locale.getDefault());
         try {
 			List<Address> prox = gC.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
-			tv.append("\n"+prox.get(0).getPostalCode());
+			tv.append("\n"+prox.get(0).getPostalCode().replaceAll(" ", ""));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			tv.append(":::::::");
@@ -84,6 +59,14 @@ public class Base extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_base, menu);
         return true;
+    }
+    
+    public String getCity(String postalCode)
+    {
+    	final String initURL = "http://maps.googleapis.com/maps/api/geocode/json?address=";
+    	final String finURL = "&sensor=true";
+    	String requestURL = initURL+postalCode+finURL;
+    	return "";
     }
 
     
