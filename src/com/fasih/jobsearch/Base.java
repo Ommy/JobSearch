@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -30,26 +31,32 @@ public class Base extends Activity {
         ConnectivityManager cMan = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         if (nInfo.isConnected())
-        {
-        	tv.setTextColor(Color.GREEN);
-        	tv.setText("Connected");
-        }
+          	tv.setText("Connected"); 
         else
-        {
-        	tv.setTextColor(Color.RED);
         	tv.setText("Not Connected");
-        }
         LocationManager lM = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
         Location userLocation = lM.getLastKnownLocation(lM.NETWORK_PROVIDER);
+        Location planTwo = lM.getLastKnownLocation(lM.GPS_PROVIDER);
+        Geocoder gC = new Geocoder(getBaseContext(),Locale.getDefault());
+        try {
+			Log.d("LOC_DATA", (gC.getFromLocation(planTwo.getLatitude(),planTwo.getLongitude(),1).get(0).toString()));
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			Log.e("LOC_ERR","CANT FIND LOCATION");
+		}
+        
         if (userLocation != null)
         	tv.append("\n"+userLocation.toString());
         else
         	tv.append("No location available");
-        Geocoder gC = new Geocoder(getBaseContext(),Locale.getDefault());
         try {
-			List<Address> prox = gC.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
-			tv.append("\n"+prox.get(0).getPostalCode().replaceAll(" ", ""));
-		} catch (IOException e) {
+			//List<Address> prox = gC.getFromLocation(userLocation.getLatitude(), userLocation.getLongitude(), 1);
+			//List<Address> p2 = gC.getFromLocation(planTwo.getLatitude(), planTwo.getLongitude(), 1);
+			//tv.append("\n"+prox.get(0).getPostalCode().replaceAll(" ", ""));
+			//tv.append("\n"+p2.get(0));
+        	if (lM.isProviderEnabled(lM.GPS_PROVIDER))
+        		tv.append(lM.GPS_PROVIDER);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			tv.append(":::::::");
 		}
