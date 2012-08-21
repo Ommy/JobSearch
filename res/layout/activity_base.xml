@@ -10,4 +10,16 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:text="Not Connected" />
+
+    <TextView
+        android:id="@+id/errorTXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="94dp"
+        android:color="#FA0C0C"
+        android:text="Could not find your location! Is there any GPS disruption?" />
+
+
 </RelativeLayout>
