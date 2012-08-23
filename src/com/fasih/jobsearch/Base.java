@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.fasih.jobsearch.GrabLocation.LocationResult;
+
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -22,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 
 public class Base extends Activity {
@@ -36,22 +42,25 @@ public class Base extends Activity {
 		TextView tv = (TextView)findViewById(R.id.tV);
 		ConnectivityManager cMan = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		if (!nInfo.isAvailable())
+			nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 		if (nInfo.isConnected())
 			tv.setText("Connected"); 
 		else
 			tv.setText("Not Connected");
 		String city = "";
+
 		try {
-			while((city.equals("")))
-				city = getLocation(Locale.getDefault(),getBaseContext(),true,false,false);
+			city = getLocation(Locale.getDefault(),getBaseContext(),true,false,false);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		tv.append("\n"+city);
 		if(nInfo.isConnected() && city != ""){
 			proceed.setVisibility(View.VISIBLE);
 		}
-		
+	
 	}
 
 	@Override
@@ -60,34 +69,33 @@ public class Base extends Activity {
 		return true;
 	}
 	public String getLocation(Locale locale, Context context, boolean city, boolean postal, boolean state_prov) throws IOException{
-		LocationManager locMan = (LocationManager)this.getSystemService(Context.LOCATION_SERVICE);
-		LocationListener locList = new MyLocList();
 		Geocoder gC = new Geocoder(context,locale);
-		Location gpsLocation = locMan.getLastKnownLocation(locMan.GPS_PROVIDER);
-		locMan.requestLocationUpdates(locMan.NETWORK_PROVIDER, 500, 200, locList);
-		Location networkLocation = locMan.getLastKnownLocation(locMan.NETWORK_PROVIDER);
+		GrabLocation myLocation = new GrabLocation();
+		myLocation.getConnectionInfo(this,locationResult);
+		Location location = myLocation.locMan.getLastKnownLocation(myLocation.getWorkingProvider());
 		
 		if (city){
-			return (gC.getFromLocation(networkLocation.getLatitude(), networkLocation.getLongitude(), 1).get(0).getSubAdminArea());
+			return (gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getSubAdminArea());
 		}
 		else if (postal)
-			return (gC.getFromLocation(networkLocation.getLatitude(), networkLocation.getLongitude(), 1).get(0).getPostalCode());
+			return (gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getPostalCode());
 		else if (state_prov)
-			return (gC.getFromLocation(networkLocation.getLatitude(), networkLocation.getLongitude(), 1).get(0).getAdminArea());
+			return (gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getAdminArea());
 		else
-			return "";
+			return "nothing";
 	}
 	public final class MyLocList implements LocationListener
 	{
-
+		public double latitude;
+		public double longitude;
 		public void onLocationChanged(Location arg0) {
-			// TODO Auto-generated method stub
+			latitude = arg0.getLatitude();
+			longitude = arg0.getLongitude();
 
 		}
 
 		public void onProviderDisabled(String provider) {
 			// TODO Auto-generated method stub
-
 		}
 
 		public void onProviderEnabled(String provider) {
@@ -101,14 +109,12 @@ public class Base extends Activity {
 		}
 	}
 
-	public String getCity(String postalCode)
-	{
-		final String initURL = "http://maps.googleapis.com/maps/api/geocode/json?address=";
-		final String finURL = "&sensor=true";
-		String requestURL = initURL+postalCode+finURL;
-		return "";
-	}
-
+	LocationResult locationResult = new LocationResult(){
+		@Override
+		public void gotLocation(Location location){
+			
+		}
+	};
 
 
 }

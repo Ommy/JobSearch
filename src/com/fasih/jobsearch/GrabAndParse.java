@@ -5,7 +5,8 @@ import android.app.Activity;
 public class GrabAndParse extends Activity {
 
 	public void grabJSONFromURL(){
-		
+		HttpClient req = new HttpClient();
+	
 	}
 }
 
