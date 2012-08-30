@@ -51,25 +51,26 @@ public class GrabAndParse extends Activity {
 					HttpEntity responseEntity = response.getEntity();
 					// Read response data into buffer
 					//char[] buffer = new char[(int)responseEntity.getContentLength()];
-					InputStream stream = responseEntity.getContent();
-					
+					//-InputStream stream = responseEntity.getContent();
+
 					// InputStreamReader reader = new InputStreamReader(stream);
-					BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-					
+					//-BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+
 					String test = EntityUtils.toString(responseEntity);
 					JSONObject res = new JSONObject(test);
 					JSONArray jobs = res.getJSONArray("results");
 					JSONObject obj = jobs.getJSONObject(0);
 					String check = obj.getString("jobtitle");
-					System.out.println(check);
-					
-					
+					String check2 = obj.getString("company");
+					System.out.println(check+":"+check2);
+
+
 					StringBuilder builder = new StringBuilder();
 					String line;
-					while ((line = reader.readLine()) != null) {
-						json.add(line);
-					}
-					stream.close();
+					//-while ((line = reader.readLine()) != null) {
+					//-	json.add(line);
+					//-}
+					//-stream.close();
 					//theString = builder.toString();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -79,10 +80,7 @@ public class GrabAndParse extends Activity {
 
 				// Toast.makeText(this, jsaPersons.getString(1) + "\n", Toast.LENGTH_LONG).show() ;
 				//Toast.makeText(getBaseContext(), theString + "\n", Toast.LENGTH_LONG).show();
-				for (String x : json){
-					System.out.println(x);
-				}
-//				System.out.println(theString);
+				//System.out.println(theString);
 
 
 			}
