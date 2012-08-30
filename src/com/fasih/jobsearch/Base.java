@@ -1,10 +1,19 @@
 package com.fasih.jobsearch;
 //http://api.indeed.com/ads/apisearch?publisher=8188725749639977&q=java&l=austin%2C+tx&sort=&radius=&st=&jt=&start=&limit=&fromage=&filter=&latlong=1&co=us&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0%28Firefox%29&v=2
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,6 +29,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +47,7 @@ public class Base extends Activity {
 		setContentView(R.layout.activity_base);
 		
 		Button proceed = (Button)findViewById(R.id.contBTN);
-		proceed.setVisibility(View.GONE);
+		//proceed.setVisibility(View.GONE);
 		
 		TextView tv = (TextView)findViewById(R.id.tV);
 		ConnectivityManager cMan = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
@@ -48,19 +58,16 @@ public class Base extends Activity {
 			tv.setText("Connected"); 
 		else
 			tv.setText("Not Connected");
-		String city = "";
-
-		try {
-			city = getLocation(Locale.getDefault(),getBaseContext(),true,false,false);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		tv.append("\n"+city);
-		if(nInfo.isConnected() && city != ""){
-			proceed.setVisibility(View.VISIBLE);
-		}
-	
+		GrabLocation grab = new GrabLocation();
+		grab.getConnectionInfo(getBaseContext(), locationResult);
+		proceed.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(getBaseContext(),StepTwo.class);
+				startActivity(i);
+			}
+		});
 	}
 
 	@Override
@@ -68,53 +75,29 @@ public class Base extends Activity {
 		getMenuInflater().inflate(R.menu.activity_base, menu);
 		return true;
 	}
-	public String getLocation(Locale locale, Context context, boolean city, boolean postal, boolean state_prov) throws IOException{
-		Geocoder gC = new Geocoder(context,locale);
-		GrabLocation myLocation = new GrabLocation();
-		myLocation.getConnectionInfo(this,locationResult);
-		Location location = myLocation.locMan.getLastKnownLocation(myLocation.getWorkingProvider());
-		
-		if (city){
-			return (gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getSubAdminArea());
-		}
-		else if (postal)
-			return (gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getPostalCode());
-		else if (state_prov)
-			return (gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getAdminArea());
-		else
-			return "nothing";
-	}
-	public final class MyLocList implements LocationListener
-	{
-		public double latitude;
-		public double longitude;
-		public void onLocationChanged(Location arg0) {
-			latitude = arg0.getLatitude();
-			longitude = arg0.getLongitude();
-
-		}
-
-		public void onProviderDisabled(String provider) {
-			// TODO Auto-generated method stub
-		}
-
-		public void onProviderEnabled(String provider) {
-			// TODO Auto-generated method stub
-
-		}
-
-		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// TODO Auto-generated method stub
-
-		}
-	}
-
 	LocationResult locationResult = new LocationResult(){
 		@Override
 		public void gotLocation(Location location){
-			
+			Geocoder gC = new Geocoder(getBaseContext(), Locale.getDefault());
+			try {
+				String city = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getLocality();
+				String state_province = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getAdminArea();
+				Context context = getApplicationContext();
+				CharSequence text = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).toString();
+				Log.d("DATA==",text.toString());
+				int duration = Toast.LENGTH_LONG;
+
+				Toast toast = Toast.makeText(context, text, duration);
+				toast.show();
+				Bundle b = new Bundle();
+				b.putString("CITY", city);
+				b.putString("STATE_PROVINCE", state_province);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
 	};
-
-
 }
+
