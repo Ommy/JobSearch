@@ -26,12 +26,55 @@ import android.widget.Toast;
 public class GrabAndParse extends Activity {
 	public String URL = "http://api.indeed.com/ads/apisearch?publisher=8188725749639977&q=java&l=austin%2C+tx&sort=&format=json&radius=&st=&jt=&start=&limit=&fromage=&filter=&latlong=1&co=us&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0%28Firefox%29&v=2";
 	public String data = "";
-	public void grabJSONFromURL(){
-		HttpClient req = new HttpClient();
+	public String city = "";
 
-	}
 	public void setRequestURL(String URL){
 		this.URL = URL;
+	}
+	public void setMapsCity(String x){
+		this.city = x;
+	}
+	public String getMapsCity(){
+		return this.city;
+	}
+	public String getCityFromJSON(final String postal_zip_code,final String initURL,final String finURL){
+		Thread thread = new Thread(new Runnable(){
+			public void run() {
+				String mapsURL = initURL + postal_zip_code + finURL;
+				System.out.println(mapsURL);
+				HttpGet request = new HttpGet(mapsURL);
+				DefaultHttpClient httpClient = new DefaultHttpClient();
+				JSONArray jsArray;
+				JSONObject obj;
+				try{
+					HttpResponse response = httpClient.execute(request);
+					HttpEntity responseEntity = response.getEntity();
+					
+					String test = EntityUtils.toString(responseEntity);
+					JSONObject res = new JSONObject(test);
+					JSONArray mapsData = res.getJSONArray("results");
+
+					JSONObject test1 = mapsData.getJSONObject(0);
+					JSONArray jArr = test1.getJSONArray("address_components");
+					//System.out.println(test1.getJSONArray("address_components").getJSONObject(2).getString("long_name"));
+					System.out.println(test1.getJSONArray("address_components").getJSONObject(2).getJSONArray("types").getString(0));
+					for(int i=0;i<jArr.length();i++){
+						if (jArr.getJSONObject(i).getJSONArray("types").getString(0).equals("locality")){
+							setMapsCity(jArr.getJSONObject(i).getString("long_name"));
+							return;
+						}
+					}
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				
+			}
+		});
+		thread.start();
+		if (!thread.isAlive())
+			return city;
+		else
+			return "";
 	}
 	public String getJSON() {
 
@@ -51,12 +94,12 @@ public class GrabAndParse extends Activity {
 					HttpEntity responseEntity = response.getEntity();
 					// Read response data into buffer
 					//char[] buffer = new char[(int)responseEntity.getContentLength()];
-					//-InputStream stream = responseEntity.getContent();
+					InputStream stream = responseEntity.getContent();
 
 					// InputStreamReader reader = new InputStreamReader(stream);
-					//-BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+					BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
 
-					String test = EntityUtils.toString(responseEntity);
+					/*String test = EntityUtils.toString(responseEntity);
 					JSONObject res = new JSONObject(test);
 					JSONArray jobs = res.getJSONArray("results");
 					JSONObject obj = jobs.getJSONObject(0);
@@ -64,25 +107,18 @@ public class GrabAndParse extends Activity {
 					String check2 = obj.getString("company");
 					System.out.println(check+":"+check2);
 
-
+					*/
 					StringBuilder builder = new StringBuilder();
 					String line;
-					//-while ((line = reader.readLine()) != null) {
-					//-	json.add(line);
-					//-}
-					//-stream.close();
+					while ((line = reader.readLine()) != null) {
+						json.add(line);
+					}
+					stream.close();
 					//theString = builder.toString();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}        
-
-
-				// Toast.makeText(this, jsaPersons.getString(1) + "\n", Toast.LENGTH_LONG).show() ;
-				//Toast.makeText(getBaseContext(), theString + "\n", Toast.LENGTH_LONG).show();
-				//System.out.println(theString);
-
-
 			}
 		});
 		t.start();

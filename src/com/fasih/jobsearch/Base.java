@@ -60,14 +60,7 @@ public class Base extends Activity {
 			tv.setText("Not Connected");
 		GrabLocation grab = new GrabLocation();
 		grab.getConnectionInfo(getBaseContext(), locationResult);
-		proceed.setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Intent i = new Intent(getBaseContext(),StepTwo.class);
-				startActivity(i);
-			}
-		});
+
 	}
 
 	@Override
@@ -82,19 +75,27 @@ public class Base extends Activity {
 			try {
 				String city = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getLocality();
 				String state_province = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getAdminArea();
+				String postal_zip = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getPostalCode().replace(" ", "");
 				Context context = getApplicationContext();
 				CharSequence text = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).toString();
 				Log.d("DATA==",text.toString());
 				int duration = Toast.LENGTH_LONG;
 
-				Toast toast = Toast.makeText(context, text, duration);
+				Toast toast = Toast.makeText(context, postal_zip, duration);
 				toast.show();
 				Bundle b = new Bundle();
 				b.putString("CITY", city);
 				b.putString("STATE_PROVINCE", state_province);
+				
+				GrabAndParse jsonLocation = new GrabAndParse();
+				jsonLocation.setRequestURL("http://maps.googleapis.com/maps/api/geocode/json?address=M3C2Y6&sensor=false");
+				jsonLocation.getJSON();
+				String city_from_json = jsonLocation.getCityFromJSON(postal_zip,"http://maps.googleapis.com/maps/api/geocode/json?address=","&sensor=false");
+				System.out.println(city_from_json + "XX" + jsonLocation.getMapsCity());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.out.println("Server error");
 			}
 		}
 
