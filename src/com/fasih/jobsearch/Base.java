@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -41,14 +44,16 @@ import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 
 public class Base extends Activity {
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_base);
-		
+
 		Button proceed = (Button)findViewById(R.id.contBTN);
 		//proceed.setVisibility(View.GONE);
-		
+
 		TextView tv = (TextView)findViewById(R.id.tV);
 		ConnectivityManager cMan = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -71,31 +76,31 @@ public class Base extends Activity {
 	LocationResult locationResult = new LocationResult(){
 		@Override
 		public void gotLocation(Location location){
+			final ExecutorService service;
+			final Future<String> task;
 			Geocoder gC = new Geocoder(getBaseContext(), Locale.getDefault());
 			try {
 				String city = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getLocality();
 				String state_province = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getAdminArea();
 				String postal_zip = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getPostalCode().replace(" ", "");
-				Context context = getApplicationContext();
-				CharSequence text = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).toString();
-				Log.d("DATA==",text.toString());
 				int duration = Toast.LENGTH_LONG;
 
-				Toast toast = Toast.makeText(context, postal_zip, duration);
-				toast.show();
+
 				Bundle b = new Bundle();
-				b.putString("CITY", city);
 				b.putString("STATE_PROVINCE", state_province);
-				
-				GrabAndParse jsonLocation = new GrabAndParse();
-				jsonLocation.setRequestURL("http://maps.googleapis.com/maps/api/geocode/json?address=M3C2Y6&sensor=false");
-				jsonLocation.getJSON();
-				String city_from_json = jsonLocation.getCityFromJSON(postal_zip,"http://maps.googleapis.com/maps/api/geocode/json?address=","&sensor=false");
-				System.out.println(city_from_json + "XX" + jsonLocation.getMapsCity());
-			} catch (IOException e) {
+
+				if (city == null || city.equals("")){
+					service = Executors.newFixedThreadPool(1);        
+					task    = service.submit(new GrabAndParse("http://maps.googleapis.com/maps/api/geocode/json?address=",postal_zip,"&sensor=false"));
+					city = task.get();
+				}
+				b.putString("CITY", city);
+				Intent i = new Intent(Base.this,SearchOptions.class);
+				i.putExtras(b);
+				startActivity(i);
+				} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				System.out.println("Server error");
 			}
 		}
 
