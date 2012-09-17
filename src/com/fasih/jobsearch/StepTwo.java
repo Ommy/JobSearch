@@ -11,7 +11,7 @@ public class StepTwo extends Activity {
 	public void onCreate (Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		GrabAndParse gP = new GrabAndParse();
-		String JSON_TEXT = gP.getJSON();
+		//String JSON_TEXT = gP.getJSON();
 
 	}
 }

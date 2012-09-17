@@ -8,6 +8,8 @@ public class SearchOptions extends Activity {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.search_job);
+		//setContentView(R.layout.search_options);
 		/* What to populate listview with
 		 * q -> Query 
 		 * l -> Location

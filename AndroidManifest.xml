@@ -21,6 +21,10 @@
         	android:name=".StepTwo"
         />
         <activity
+        	android:label = "SearchOptions"
+        	android:name = ".SearchOptions"
+        />
+        <activity
             android:name=".Base"
             android:label="@string/title_activity_base" >
             <intent-filter>

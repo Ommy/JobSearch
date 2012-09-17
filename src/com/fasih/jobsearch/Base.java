@@ -50,22 +50,18 @@ public class Base extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_base);
-
-		Button proceed = (Button)findViewById(R.id.contBTN);
-		//proceed.setVisibility(View.GONE);
-
-		TextView tv = (TextView)findViewById(R.id.tV);
+		TextView tV = (TextView)findViewById(R.id.tV);
 		ConnectivityManager cMan = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		Geocoder gC = new Geocoder(getBaseContext(),Locale.getDefault());
 		if (!nInfo.isAvailable())
 			nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		if (nInfo.isConnected())
-			tv.setText("Connected"); 
-		else
-			tv.setText("Not Connected");
-		GrabLocation grab = new GrabLocation();
-		grab.getConnectionInfo(getBaseContext(), locationResult);
-
+		if (!nInfo.isConnected())
+			tV.setText("Sorry! Unable to establish connection! Please conntect to the internet in order to procceed. ");
+		else{
+			GrabLocation grab = new GrabLocation();
+			grab.getConnectionInfo(getBaseContext(), locationResult);
+		}
 	}
 
 	@Override
@@ -83,16 +79,15 @@ public class Base extends Activity {
 				String city = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getLocality();
 				String state_province = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getAdminArea();
 				String postal_zip = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getPostalCode().replace(" ", "");
-				int duration = Toast.LENGTH_LONG;
-
-
 				Bundle b = new Bundle();
 				b.putString("STATE_PROVINCE", state_province);
-
+				b.putDouble("Longitude",location.getLongitude());
+				b.putDouble("Latitude", location.getLatitude());
+				
 				if (city == null || city.equals("")){
 					service = Executors.newFixedThreadPool(1);        
 					task    = service.submit(new GrabAndParse("http://maps.googleapis.com/maps/api/geocode/json?address=",postal_zip,"&sensor=false"));
-					city = task.get();
+					city 	= task.get();
 				}
 				b.putString("CITY", city);
 				Intent i = new Intent(Base.this,SearchOptions.class);
@@ -101,6 +96,7 @@ public class Base extends Activity {
 				} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.out.println("NOPE");
 			}
 		}
 

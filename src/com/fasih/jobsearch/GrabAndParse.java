@@ -83,54 +83,6 @@ public class GrabAndParse extends Activity implements Callable<String> {
 		else
 			return "";
 	}
-	public String getJSON() {
-
-		Thread t = new Thread(new Runnable(){
-			public void run(){
-				//Looper.prepare();
-				ArrayList<String> json = new ArrayList<String>();
-				HttpGet request = new HttpGet(URL);        
-				DefaultHttpClient httpClient = new DefaultHttpClient();
-				String theString = new String("");
-				JSONArray jsArray;
-
-				//JSONArray jsaPersons = null ;
-
-				try {
-					HttpResponse response = httpClient.execute(request);
-					HttpEntity responseEntity = response.getEntity();
-					// Read response data into buffer
-					//char[] buffer = new char[(int)responseEntity.getContentLength()];
-					InputStream stream = responseEntity.getContent();
-
-					// InputStreamReader reader = new InputStreamReader(stream);
-					BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-
-					/*String test = EntityUtils.toString(responseEntity);
-					JSONObject res = new JSONObject(test);
-					JSONArray jobs = res.getJSONArray("results");
-					JSONObject obj = jobs.getJSONObject(0);
-					String check = obj.getString("jobtitle");
-					String check2 = obj.getString("company");
-					System.out.println(check+":"+check2);
-
-					*/
-					StringBuilder builder = new StringBuilder();
-					String line;
-					while ((line = reader.readLine()) != null) {
-						json.add(line);
-					}
-					stream.close();
-					//theString = builder.toString();
-				} catch (Exception e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}        
-			}
-		});
-		t.start();
-		return "";
-	}
 	public String call() throws Exception {
 		//String mapsURL = initURL + postal_zip_code + finURL;
 		String mapsURL = this.URL;
@@ -144,6 +96,7 @@ public class GrabAndParse extends Activity implements Callable<String> {
 			HttpEntity responseEntity = response.getEntity();
 			
 			String test = EntityUtils.toString(responseEntity);
+			return test;/*
 			JSONObject res = new JSONObject(test);
 			JSONArray mapsData = res.getJSONArray("results");
 
@@ -153,7 +106,7 @@ public class GrabAndParse extends Activity implements Callable<String> {
 				if (jArr.getJSONObject(i).getJSONArray("types").getString(0).equals("locality")){
 					return jArr.getJSONObject(i).getString("long_name");
 				}
-			}
+			}*/
 		}catch(Exception e){
 			e.printStackTrace();
 			System.out.println("Oops");
