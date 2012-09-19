@@ -33,8 +33,9 @@ public final class R {
         public static final int grabLocation=0x7f080007;
         public static final int includeWords=0x7f08000b;
         public static final int includeWordsTV=0x7f08000a;
-        public static final int menu_settings=0x7f08000e;
+        public static final int menu_settings=0x7f08000f;
         public static final int optionalAdvanced=0x7f080009;
+        public static final int searchBTN=0x7f08000e;
         public static final int tV=0x7f080000;
     }
     public static final class layout {
