@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:id="@+id/RelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/basicTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="18dip"
+            android:text="Basic Job Search"
+            android:textSize="35px" />
+
+        <TextView
+            android:id="@+id/Job_Type_TV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/basicTitle"
+            android:layout_marginBottom="20dip"
+            android:text="Job Type: "
+            android:textSize="29px" />
+
+        <EditText
+            android:id="@+id/JobType"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/basicTitle"
+            android:layout_marginBottom="10dip"
+            android:layout_toRightOf="@+id/Job_Type_TV" />
+
+        <TextView
+            android:id="@+id/LocationTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Job_Type_TV"
+            android:layout_marginBottom="10dip"
+            android:text="Location:"
+            android:textSize="29px" />
+
+        <Button
+            android:id="@+id/grabLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/LocationTV"
+            android:layout_marginBottom="10dip"
+            android:text="Locate"
+            android:textSize="20px" />
+
+        <EditText
+            android:id="@+id/Location"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/JobType"
+            android:layout_marginBottom="10dip"
+            android:layout_toRightOf="@+id/grabLocation" />
+
+        <TextView
+            android:id="@+id/optionalAdvanced"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/grabLocation"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="12dip"
+            android:text="@string/advanced_header"
+            android:textSize="30px" />
+
+        <TextView
+            android:id="@+id/includeWordsTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/optionalAdvanced"
+            android:layout_marginBottom="10dip"
+            android:text="With words"
+            android:textSize="29px" />
+
+        <EditText
+            android:id="@+id/includeWords"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/optionalAdvanced"
+            android:layout_marginBottom="10dip"
+            android:layout_toRightOf="@+id/includeWordsTV"
+            android:hint="Seperate with commas" />
+
+        <TextView
+            android:id="@+id/avgSalaryTV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/includeWords"
+            android:layout_marginBottom="10dip"
+            android:text="Average Salary:"
+            android:textSize="29px" />
+
+        <EditText
+            android:id="@+id/avgSalary"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/includeWords"
+            android:layout_toRightOf="@+id/avgSalaryTV"
+            android:hint="$"
+            android:inputType="numberSigned" />
+        <Button
+            android:id="@+id/searchBTN"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/avgSalary"
+            android:text="Search"
+            />
+    </RelativeLayout>
+
+</ScrollView>
