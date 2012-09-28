@@ -1,47 +1,27 @@
 package com.fasih.jobsearch;
 //http://api.indeed.com/ads/apisearch?publisher=8188725749639977&q=java&l=austin%2C+tx&sort=&radius=&st=&jt=&start=&limit=&fromage=&filter=&latlong=1&co=us&chnl=&userip=1.2.3.4&useragent=Mozilla/%2F4.0%28Firefox%29&v=2
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasih.jobsearch.GrabLocation.LocationResult;
 
-import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v4.app.NavUtils;
 
 public class Base extends Activity {
 
@@ -53,15 +33,10 @@ public class Base extends Activity {
 		TextView tV = (TextView)findViewById(R.id.tV);
 		ConnectivityManager cMan = (ConnectivityManager)getSystemService(CONNECTIVITY_SERVICE);
 		NetworkInfo nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		tV.setText(nInfo.isConnected()+"--");
 		Geocoder gC = new Geocoder(getBaseContext(),Locale.getDefault());
-		if (!nInfo.isAvailable())
-			nInfo = cMan.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
-		if (!nInfo.isConnected())
-			tV.setText("Sorry! Unable to establish connection! Please conntect to the internet in order to procceed. ");
-		else{
-			GrabLocation grab = new GrabLocation();
-			grab.getConnectionInfo(getBaseContext(), locationResult);
-		}
+		GrabLocation grab = new GrabLocation();
+		grab.getConnectionInfo(getBaseContext(), locationResult);
 	}
 
 	@Override
@@ -75,7 +50,15 @@ public class Base extends Activity {
 			final ExecutorService service;
 			final Future<String> task;
 			Geocoder gC = new Geocoder(getBaseContext(), Locale.getDefault());
+			Context context = getApplicationContext();
+			CharSequence text = location.getProvider();
+			int duration = Toast.LENGTH_SHORT;
+			boolean cityNullFlag = false;
+
+			Toast toast = Toast.makeText(context, text, duration);
+			toast.show();
 			try {
+
 				String city = gC.getFromLocation(location.getLatitude(), location.getLongitude(), 1).get(0).getLocality();
 				String state_province = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getAdminArea();
 				String postal_zip = gC.getFromLocation(location.getLatitude(),location.getLongitude(),1).get(0).getPostalCode().replace(" ", "");
@@ -83,20 +66,31 @@ public class Base extends Activity {
 				b.putString("STATE_PROVINCE", state_province);
 				b.putDouble("Longitude",location.getLongitude());
 				b.putDouble("Latitude", location.getLatitude());
-				
-				if (city == null || city.equals("")){
+				if (city == null || city.equals(""))
+					cityNullFlag = true;
+				if (!cityNullFlag){
 					service = Executors.newFixedThreadPool(1);        
 					task    = service.submit(new GrabAndParse("http://maps.googleapis.com/maps/api/geocode/json?address=",postal_zip,"&sensor=false"));
 					city 	= task.get();
+				}
+				if (cityNullFlag){
+					JSONObject res = new JSONObject(city);
+					JSONArray mapsData = res.getJSONArray("results");
+
+					JSONObject test1 = mapsData.getJSONObject(0);
+					JSONArray jArr = test1.getJSONArray("address_components");
+					for(int i=0;i<jArr.length();i++){
+						if (jArr.getJSONObject(i).getJSONArray("types").getString(0).equals("locality")){
+							city = jArr.getJSONObject(i).getString("long_name");
+						}
+					}
 				}
 				b.putString("CITY", city);
 				Intent i = new Intent(Base.this,SearchOptions.class);
 				i.putExtras(b);
 				startActivity(i);
-				} catch (Exception e) {
-				// TODO Auto-generated catch block
+			} catch (Exception e) {
 				e.printStackTrace();
-				System.out.println("NOPE");
 			}
 		}
 

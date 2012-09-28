@@ -105,11 +105,18 @@
             android:layout_toRightOf="@+id/avgSalaryTV"
             android:hint="$"
             android:inputType="numberSigned" />
+        <Spinner
+            android:id="@+id/jobTypeSpinner"
+            android:layout_width = "fill_parent"
+            android:layout_height = "wrap_content"
+            android:layout_below = "@+id/avgSalary"
+            android:entries="@array/jobTypeStrings"
+            />
         <Button
             android:id="@+id/searchBTN"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/avgSalary"
+            android:layout_below="@+id/jobTypeSpinner"
             android:text="Search"
             />
     </RelativeLayout>
